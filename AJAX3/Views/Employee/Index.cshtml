@@ -1,0 +1,223 @@
+﻿@model IEnumerable<AJAX3.Models.Employee>
+
+@{
+    ViewData["Title"] = "Index";
+}
+
+<h1>Index</h1>
+<!-- Button trigger modal -->
+<button type="button" class="btn btn-primary " data-bs-toggle="modal" data-bs-target="#exampleModal" >
+    Add New Employee
+</button>
+<div class=" table-responsive">
+    <table class="table table-bordered table-condensed table-striped  table-summary custom-table mb-0" id="employee">
+        <tr>
+            <th>
+                Name
+            </th>
+            <th>
+                Email
+            </th>
+            <th>
+                Phone
+            </th>
+        </tr>
+        <tbody calss="tbody">  </tbody>
+    </table>
+
+    <button type="button" class="btn btn-primary add saveDataclickss" id="saveDataclickss">Save changes</button>
+</div>
+<!-- Modal -->
+<div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Modal title</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form>
+                    <div class="form-group">
+                        <label for="Name">Name</label>
+                        <input type="text" class="form-control" id="name" placeholder="Name" />
+                    </div>
+                    <div class="form-group">
+                        <label for="Email">Email</label>
+                        <input type="text" class="form-control" id="email" placeholder="Email" />
+                    </div>
+                    <div class="form-group">
+                        <label for="Phone">Phone</label>
+                        <input type="text" class="form-control" id="Phone" placeholder="Phone" />
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+               
+                <input type="submit" class="btn btn-primary saveData  " value="Add Emp" />
+                <button type="button" class="btn btn-secondary "  data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+
+    <script type="text/javascript">
+        $(document).ready(function () {
+            LodData();
+        });
+  function LodData() {
+            $.ajax({
+                type: "GET",
+                url: '@Url.Action("Create", "Employee")',
+                dataType: "Json",
+                contentType: "application/json; charset=utf-8",
+                success: function (resopnse) {
+                    $(".table-summary .tbody");
+                    for (var i = 0; i < resopnse.length; i++) {
+                        var br = resopnse[i];
+                        var str = '<tr><td>' + br.name + '</td><td>' + br.email + '</td><td>' + br.phone +
+                            '</td><td style ="margen:0;"><input type="button" class="btn btn-danger " id = "btnDelete" value = "Delete" /></td></tr>';
+                        $('.table-summary').append(str);
+                    }
+                    $('#exampleModal').modal('hide');
+                },
+                Error: function () {
+                    alert: ("Error ");
+                }
+            });
+        }
+     
+    </script>
+
+    <script>
+        $(".saveData").click(function () {
+            var Name = $("#name").val();
+            var Email = $("#email").val();
+            var Phone = $("#Phone").val();
+            $.ajax({
+                type: "POST",
+                url: '@Url.Action("ADD")',
+                dataType: "Json",
+                data: { Name: Name, Email: Email, Phone: Phone },
+                success: function (data) {
+                    if (data != null) {
+                        var employeeTable = $('#employee tbody');
+                        employeeTable.empty();
+                        LodData();
+                    }
+                }
+            });
+        });
+    </script>
+
+     <script>
+        $("#btnDelete").click(function (e) { 
+            debugger;
+            $.ajax({
+                type: "POST",
+                url: '@Url.Action("Delete")',
+                dataType: "Json",
+                data: JSON.stringify({ id: id }),
+                success: function () {
+                    alet("Delted");
+
+                }
+            });
+        });
+    </script> 
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+@*@section Scripts{
+            <script>
+                function Add() {
+
+            var name = $('#Name').val();
+            var email = $('#Email').val();
+            var phone = $('#Phone').val();
+
+            $.ajax({
+                url: '@Url.Action("Add", "Employee")',
+                type: 'POST',
+                dataType: 'json',
+                data: { Name: name, Email: email, Phone: phone },
+                success: function (result) {
+                    if (result) {
+                        $.ajax({
+                            url: '@Url.Action("Create", "Employee")',
+                            type: 'GET',
+                            dataType: 'json',
+                            success: function (data) {
+                                if (data) {
+                                    $('#Name').val('');
+                                    $('#Email').val('');
+                                    $('#Phone').val('');
+                                    $('.tbody').empty();
+
+                                    $.each(data, function (index, item) {
+                                        var newRow = '<tr><td>' + item.name + '</td><td>' + item.email + '</td><td>' + item.phone + '</td></tr>';
+                                        $('.tbody').append(newRow);
+                                    });
+
+                                    $('#exampleModal').modal('hide');
+                                } else {
+                                    alert('Failed to add employee.');
+                                }
+                            },
+                            error: function () {
+                                alert('Failed to retrieve updated employee data.');
+                            }
+                        });
+                    } else {
+                        alert('Failed to add employee.');
+                    }
+                },
+                error: function () {
+                    alert('An error occurred.');
+                }
+            });
+        }
+</script>
+}*@
+
+@* @foreach (var item in Model)
+        {
+            <tr>
+                <td>@item.Name</td>
+                <td>@item.Email</td>
+                <td>@item.Phone</td>
+                <td>
+                    <a class="btn btn-outline-warning aa" id="employeeDetails" >Details</a>
+                    <a href="@Url.Action("Delete", new { id = item.EmployeeID })" class="btn btn-danger" onclick="return confirm('Are you sure you want to Delete?');">
+                        Delete
+                    </a>
+                </td>
+            </tr>
+        }*@                         
